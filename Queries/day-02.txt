@@ -1,0 +1,235 @@
+CREATE TABLE players (
+  id INT,
+  player VARCHAR,
+  height INT,
+  weight INT,
+  college VARCHAR,
+  born INT,
+  birth_city VARCHAR,
+  birth_state VARCHAR
+);
+
+SELECT * FROM players;
+
+CREATE TABLE seasons_stats (
+  player_id INT,
+  year DEC,
+  position VARCHAR,
+  age DEC,
+  Tm VARCHAR,
+  G VARCHAR,
+  TS_Percentage DEC,
+  FTr DEC,
+  OWS DEC,
+  DWS DEC,
+  WS DEC,
+  FG DEC,
+  FGA DEC,
+  FG_Percentage DEC,
+  Two_Points DEC,
+  Two_PA DEC,
+  Two_Point_Percentage DEC,
+  eFG_Percentage DEC,
+  FT DEC,
+  FTA DEC,
+  FT_Percentage DEC,
+  AST DEC,
+  PF DEC,
+  PTS DEC
+);
+
+SELECT * FROM seasons_stats;
+
+SELECT players.id,
+  players.player,
+  players.height,
+  players.weight,
+  players.college,
+  players.born,
+  seasons_stats.position,
+  seasons_stats.tm
+FROM players
+INNER JOIN seasons_stats ON
+players.id = seasons_stats.player_id;
+
+
+SELECT seasons_stats.player_id,
+  players.college,
+  seasons_stats.year,
+  seasons_stats.position,
+  seasons_stats.Two_Point_Percentage,
+  seasons_stats.FG_Percentage,
+  seasons_stats.FT_Percentage,
+  seasons_stats.TS_Percentage
+FROM seasons_stats
+INNER JOIN players ON
+players.id = seasons_stats.player_id;
+
+--- 01 CREATE TABLE AND IMPORT
+
+CREATE TABLE actor (
+  actor_id integer NOT NULL,
+  first_name character varying(45) NOT NULL,
+  last_name character varying(45) NOT NULL,
+  last_update timestamp without time zone DEFAULT now() NOT NULL
+);
+
+CREATE TABLE address (
+  address_id integer NOT NULL,
+  address character varying(50) NOT NULL,
+  address2 character varying(50),
+  district character varying(20) NOT NULL,
+  city_id smallint NOT NULL,
+  postal_code character varying(10),
+  phone character varying(20) NOT NULL,
+  last_update timestamp without time zone DEFAULT now() NOT NULL
+);
+
+CREATE TABLE city (
+  city_id integer NOT NULL,
+  city character varying(50) NOT NULL,
+  country_id smallint NOT NULL,
+  last_update timestamp without time zone DEFAULT now() NOT NULL
+);
+
+CREATE TABLE country (
+    country_id integer NOT NULL,
+    country character varying(50) NOT NULL,
+    last_update timestamp without time zone DEFAULT now() NOT NULL
+);
+
+CREATE TABLE customer (
+  customer_id integer NOT NULL,
+  store_id smallint NOT NULL,
+  first_name character varying(45) NOT NULL,
+  last_name character varying(45) NOT NULL,
+  email character varying(50),
+  address_id smallint NOT NULL,
+  activebool boolean DEFAULT true NOT NULL,
+  create_date date DEFAULT ('now'::text)::date NOT NULL,
+  last_update timestamp without time zone DEFAULT now(),
+  active integer
+);
+
+CREATE TABLE customer_list (
+  id integer NOT NULL,
+  name character varying(50) NOT NULL,
+  address character varying(50) NOT NULL,
+  zip_code character varying(10),
+  phone character varying(20) NOT NULL,
+  city character varying(50) NOT NULL,
+  country character varying(50) NOT NULL,
+  notes character varying(50) NOT NULL,
+  sid integer NOT NULL
+);
+
+CREATE TABLE film (
+  film_id integer NOT NULL,
+  title character varying(255) NOT NULL,
+  description text,
+  release_year integer,
+  language_id smallint NOT NULL,
+  original_language_id smallint,
+  rental_duration smallint DEFAULT 3 NOT NULL,
+  rental_rate numeric(4,2) DEFAULT 4.99 NOT NULL,
+  length smallint,
+  replacement_cost numeric(5,2) DEFAULT 19.99 NOT NULL,
+  rating TEXT,
+  last_update timestamp without time zone DEFAULT now() NOT NULL,
+  special_features text[],
+  fulltext tsvector NOT NULL
+);
+
+CREATE TABLE film_actor (
+  actor_id smallint NOT NULL,
+  film_id smallint NOT NULL,
+  last_update timestamp without time zone DEFAULT now() NOT NULL
+);
+
+CREATE TABLE inventory (
+  inventory_id integer NOT NULL,
+  film_id smallint NOT NULL,
+  store_id smallint NOT NULL,
+  last_update timestamp without time zone DEFAULT now() NOT NULL
+);
+
+CREATE TABLE payment (
+  payment_id integer NOT NULL,
+  customer_id smallint NOT NULL,
+  staff_id smallint NOT NULL,
+  rental_id integer NOT NULL,
+  amount numeric(5,2) NOT NULL,
+  payment_date timestamp without time zone NOT NULL
+);
+
+CREATE TABLE rental (
+  rental_id integer NOT NULL,
+  rental_date timestamp without time zone NOT NULL,
+  inventory_id integer NOT NULL,
+  customer_id smallint NOT NULL,
+  return_date timestamp without time zone,
+  staff_id smallint NOT NULL,
+  last_update timestamp without time zone DEFAULT now() NOT NULL
+);
+
+CREATE TABLE staff (
+  staff_id integer NOT NULL,
+  first_name character varying(45) NOT NULL,
+  last_name character varying(45) NOT NULL,
+  address_id smallint NOT NULL,
+  email character varying(50),
+  store_id smallint NOT NULL,
+  active boolean DEFAULT true NOT NULL,
+  username character varying(16) NOT NULL,
+  password character varying(40),
+  last_update timestamp without time zone DEFAULT now() NOT NULL,
+  picture bytea
+);
+
+CREATE TABLE store (
+    store_id integer NOT NULL,
+    manager_staff_id smallint NOT NULL,
+    address_id smallint NOT NULL,
+    last_update timestamp without time zone DEFAULT now() NOT NULL
+);
+
+SELECT * FROM actor;
+
+--- 02 Aggregates
+-- Select everything from film table
+SELECT * FROM film;
+
+-- Count the amount of film_id's in film table
+SELECT COUNT(film_id) FROM film;
+
+-- Create an alias
+SELECT COUNT(film_id) AS "Total films"
+FROM film;
+
+-- Group by rating and aggregate the film_id count
+SELECT rating, COUNT(film_id) AS "Total films"
+FROM film
+GROUP BY rating;
+
+-- Select the average rental duration
+SELECT AVG(rental_duration)
+FROM film;
+
+-- Create an Alias
+SELECT AVG(rental_duration) AS "Average rental period"
+FROM film;
+
+-- Group by the rental duration, average the rental rate and give alias
+SELECT rental_duration, AVG(rental_rate) AS "Average rental rate"
+FROM film
+GROUP BY rental_duration;
+
+-- Find the rows with the minimum rental rate
+SELECT rental_duration, MIN(rental_rate) AS "Min rental rate"
+FROM film
+GROUP BY rental_duration;
+
+-- Find the rows with the maximum rental rate
+SELECT rental_duration, MAX(rental_rate) AS "Max rental rate"
+FROM film
+GROUP BY rental_duration;
